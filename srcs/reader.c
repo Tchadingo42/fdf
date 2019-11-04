@@ -27,31 +27,41 @@ int			counter_x(char *str)
 		x++;
 		free(line);
 	}
+	free(line);
 	close(fd);
 	return (x);
 }
 
-int			counter_y(char *str)
+int			counter_y(char *str) // ONE MORE LEAKS HERE
 {
-	char	**array;
+	char	**array = NULL;
 	char	*line;
 	int		y;
 	int		fd;
+
 
 	y = 0;
 	fd = open(str, O_RDONLY);
 	if (fd < 0 || str == NULL || !str[0])
 		ft_exit("fd y failed \n");
+
+
 	if (!(get_next_line(fd, &line) == 1))
 		ft_exit("gnl y failed\n");
+
 	array = ft_strsplit(line, ' ');
+
+
+	free(line);
+
 	while (get_next_line(fd, &line) == 1)
 		free(line);
 	free(line);
 	while (array[y])
-		y++;
+		free(array[y++]);
 	free(array);
 	close(fd);
+
 	return (y);
 }
 
@@ -79,6 +89,11 @@ void		fill_board(t_elem *elem, int fd)
 			elem->board[i][j] = ft_atoi(array[j]);
 			j++;
 		}
+		j = 0;
+		while (array[j])
+			free(array[j++]);
+		free(array);
+		free(line);
 		i++;
 	}
 }

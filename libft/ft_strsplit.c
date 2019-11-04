@@ -3,75 +3,93 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strsplit.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chbelan <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: lomasse <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/11/22 17:44:43 by chbelan           #+#    #+#             */
-/*   Updated: 2018/11/23 16:45:05 by chbelan          ###   ########.fr       */
+/*   Created: 2018/11/13 10:38:12 by lomasse           #+#    #+#             */
+/*   Updated: 2018/11/15 13:35:31 by lomasse          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static size_t		octets_cnt(char const *s, char c, size_t i)
+static int		ft_countchar(char const *s, char c, int *i)
 {
-	size_t			size;
+	int	nb;
 
-	size = 0;
-	while (s[i] != c && s[i])
+	nb = 0;
+	while (s[*i] != c && s[*i] != '\0')
 	{
-		i++;
-		size++;
+		nb++;
+		*i += 1;
 	}
-	return (size);
+	return (nb);
 }
 
-static size_t		words_cnt(char const *s, char c)
+static int		ft_countword(char const *s, char c)
 {
-	size_t			i;
-	size_t			cnt;
-	size_t			words;
+	int	i;
+	int	word;
+	int	check;
 
 	i = 0;
-	cnt = 0;
-	words = 0;
-	while (s[i])
+	word = 0;
+	check = 1;
+	while (s[i] != '\0')
 	{
 		if (s[i] == c)
-			cnt = 0;
-		else if (s[i] != c && cnt == 0)
 		{
-			words++;
-			cnt = 1;
+			check = 1;
+		}
+		else if (check == 1 && s[i] != c)
+		{
+			check = 0;
+			word++;
 		}
 		i++;
 	}
-	return (words);
+	return (word);
 }
 
-char				**ft_strsplit(char const *s, char c)
+static char		*ft_makestr(char const *s, char c, int *i)
 {
-	char		**tab;
-	size_t		i;
-	size_t		j;
-	size_t		k;
+	char	*str;
+	int		chara;
+	int		i2;
+	int		j;
 
+	str = NULL;
+	i2 = *i;
+	j = 0;
+	chara = ft_countchar(s, c, i);
+	if (!(str = (char *)malloc(sizeof(char) * chara + 1)))
+		return (NULL);
+	while (j < chara)
+		str[j++] = s[i2++];
+	str[j] = '\0';
+	*i = i2;
+	return (str);
+}
+
+char			**ft_strsplit(char const *s, char c)
+{
+	char	**tab;
+	int		word;
+	int		i;
+	int		j;
+
+	if (!s)
+		return (NULL);
 	i = 0;
 	j = 0;
-	if (!s || !(tab = malloc(sizeof(*tab) * (words_cnt(s, c) + 1))))
+	word = ft_countword(s, c);
+	if (!(tab = (char **)malloc(sizeof(char *) * word + 1)))
 		return (NULL);
-	while (s[i])
+	while (word--)
 	{
-		k = 0;
-		while (s[i] == c && s[i])
+		while (s[i] != '\0' && s[i] == c)
 			i++;
-		if (s[i])
-		{
-			if (!(tab[j] = malloc(sizeof(**tab) * (octets_cnt(s, c, i) + 1))))
-				return (NULL);
-			while (s[i] != c && s[i] != '\0')
-				tab[j][k++] = s[i++];
-			tab[j++][k] = '\0';
-		}
+		tab[j] = ft_makestr(s, c, &i);
+		j++;
 	}
 	tab[j] = NULL;
 	return (tab);

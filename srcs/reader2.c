@@ -16,6 +16,7 @@ void		reader(char *str, t_elem *elem)
 {
 	int		fd;
 
+
 	elem->line = counter_x(str);
 	elem->collum = counter_y(str);
 	if (!(elem->board = (int **)malloc(sizeof(int*) * elem->line)))

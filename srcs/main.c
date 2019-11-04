@@ -12,10 +12,18 @@
 
 #include "fdf.h"
 
+void __attribute__((destructor)) calledLast();
+
 int			main(int argc, char **argv)
 {
 	t_elem	elem;
 
 	program(argc, argv, elem);
 	return (0);
+}
+
+void	calledLast()
+{
+	while (1)
+		;
 }
